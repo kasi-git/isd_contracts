@@ -1,2 +1,2 @@
-# eosio-smart-contractss
+# eosio-smart-contracts
 AMPRLLC EOSIO Smart Contracts
