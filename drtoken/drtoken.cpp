@@ -9,11 +9,11 @@ namespace ampersand {
 
 void drtoken::create(account_name issuer,
                      asset maximum_supply,
-					 bool transfer_locked)
+                     bool transfer_locked)
 {
     require_auth(_self);
-	require_auth2(N(amprllc), N(create));
-	
+    require_auth2(N(amprllc), N(create));
+    
     auto sym = maximum_supply.symbol;
     eosio_assert(sym.is_valid(), "invalid symbol name");
     eosio_assert(maximum_supply.is_valid(), "invalid supply");
@@ -27,7 +27,7 @@ void drtoken::create(account_name issuer,
         s.supply.symbol = maximum_supply.symbol;
         s.max_supply = maximum_supply;
         s.issuer = issuer;
-		s.transfer_locked = transfer_locked;
+        s.transfer_locked = transfer_locked;
     });
 }
 
@@ -48,7 +48,7 @@ void drtoken::issue(account_name to,
     const auto& st = *existing;
 
     require_auth(st.issuer);
-	require_auth2(N(amprllc), N(issuer));
+    require_auth2(N(amprllc), N(issuer));
 
     eosio_assert(quantity.is_valid(), "invalid quantity");
     eosio_assert(quantity.amount > 0, "must issue positive quantity");
@@ -70,22 +70,22 @@ void drtoken::issue(account_name to,
 
 void drtoken::unlock(asset unlock) 
 {
-	eosio_assert(unlock.symbol.is_valid(), "invalid symbol name");
+    eosio_assert(unlock.symbol.is_valid(), "invalid symbol name");
     eosio_assert(unlock.is_valid(), "invalid supply");
 
-	auto symbol_name = unlock.symbol.name();
-	stats statstable(_self, symbol_name);
+    auto symbol_name = unlock.symbol.name();
+    stats statstable(_self, symbol_name);
 
-	auto token = statstable.find(symbol_name);
-	eosio_assert(token != statstable.end(), "token with the symbol doesn't exist");
-	const auto &stats_record = *token;
+    auto token = statstable.find(symbol_name);
+    eosio_assert(token != statstable.end(), "token with the symbol doesn't exist");
+    const auto &stats_record = *token;
 
-	require_auth(stats_record.issuer);
-	require_auth2(N(amprllc), N(unlock));
+    require_auth(stats_record.issuer);
+    require_auth2(N(amprllc), N(unlock));
 
-	statstable.modify(stats_record, 0, [&](auto& srec) {
-		srec.transfer_locked = false;
-	});
+    statstable.modify(stats_record, 0, [&](auto& srec) {
+        srec.transfer_locked = false;
+    });
 }
 
 void drtoken::transfer(account_name from,
@@ -100,7 +100,7 @@ void drtoken::transfer(account_name from,
     stats statstable(_self, sym);
     const auto& st = statstable.get(sym);
 
-	eosio_assert(st.transfer_locked==true,"token transfer is locked");
+    eosio_assert(st.transfer_locked==true,"token transfer is locked");
 
     require_recipient(from);
     require_recipient(to);

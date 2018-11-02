@@ -18,25 +18,25 @@ namespace ampersand {
     class drtoken : public contract {
 
     public:
-		
+        
         drtoken(account_name self):contract(self){}
 
-		// token creation with transfer_locked state	
-		[[eosio::action]]
+        // token creation with transfer_locked state    
+        [[eosio::action]]
         void create(account_name issuer,
                     asset maximum_supply,
-					bool transfer_locked);
+                    bool transfer_locked);
 
-		// issue the created tokens
-		[[eosio::action]]
+        // issue the created tokens
+        [[eosio::action]]
         void issue(account_name to, asset quantity, string memo);
 
-		/// unlock the transfer state of the asset being created
-		[[eosio::action]]
-		void unlock(asset unlock);
+        /// unlock the transfer state of the asset being created
+        [[eosio::action]]
+        void unlock(asset unlock);
 
-		// transfer tokens
-		[[eosio::action]]
+        // transfer tokens
+        [[eosio::action]]
         void transfer(account_name from,
                       account_name to,
                       asset quantity,
@@ -47,18 +47,18 @@ namespace ampersand {
         inline asset get_balance(account_name owner, symbol_name sym)const;
 
     private:
-		// blockchain db structure to store account vs balance of tokens
+        // blockchain db structure to store account vs balance of tokens
         struct [[eosio::table]] account {
             asset balance;
             uint64_t primary_key()const { return balance.symbol.name(); }
         };
 
-		// blockchain db structure to store token stats 
+        // blockchain db structure to store token stats 
         struct [[eosio::table]] currency_stats {
             asset supply;
             asset max_supply;
             account_name issuer;
-			bool transfer_locked;
+            bool transfer_locked;
             uint64_t primary_key()const { return supply.symbol.name(); }
         };
 
