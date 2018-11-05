@@ -47,15 +47,19 @@ namespace ampersand {
             asset balance;
 
             uint64_t primary_key()const { return balance.symbol.raw(); }
+
+            EOSLIB_SERIALIZE(account, (balance))
         };
 
         struct [[eosio::table]] currency_stats {
             asset supply;
-            asset max_supply;
+            asset total_supply;
             name issuer;
             bool transfer_locked;
 
             uint64_t primary_key()const { return supply.symbol.raw(); }
+
+            EOSLIB_SERIALIZE(currency_stats, (supply)(total_supply)(issuer)(transfer_locked))
         };
 
         typedef eosio::multi_index<"accounts"_n, account> accounts;

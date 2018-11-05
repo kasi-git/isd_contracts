@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Mon Nov  5 04:51:26 2018",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Mon Nov  5 11:08:10 2018",
     "version": "eosio::abi/1.0",
     "structs": [
         {
@@ -39,7 +39,7 @@
                     "type": "asset"
                 },
                 {
-                    "name": "max_supply",
+                    "name": "total_supply",
                     "type": "asset"
                 },
                 {

@@ -7,27 +7,37 @@
 namespace ampersand {
 
 void drtoken::create(name issuer,
-                     asset maximum_supply,
+                     asset new_supply,
                      bool transfer_locked)
 {
     require_auth(_code);
 //    require_auth2(name("amprllc"), name("create"));
     
-    auto sym = maximum_supply.symbol;
+    auto sym = new_supply.symbol;
     eosio_assert(sym.is_valid(), "invalid symbol name");
-    eosio_assert(maximum_supply.is_valid(), "invalid supply");
-    eosio_assert(maximum_supply.amount > 0, "max-supply must be positive");
-
+    eosio_assert(new_supply.is_valid(), "invalid supply");
+    eosio_assert(new_supply.amount > 0, "max-supply must be positive");
     stats statstable(_code, sym.raw());
-    auto existing = statstable.find(sym.raw());
-    eosio_assert(existing == statstable.end(), "token with symbol already exists");
 
-    statstable.emplace(_self, [&](auto& s) {
-        s.supply.symbol = maximum_supply.symbol;
-        s.max_supply = maximum_supply;
-        s.issuer = issuer;
-        s.transfer_locked = transfer_locked;
-    });
+    auto iterator = statstable.find(sym.raw());
+
+    // Token is added for the first time
+    if (iterator == statstable.end()){	
+        statstable.emplace(_self, [&](auto& token_stats) {
+            token_stats.supply.symbol = new_supply.symbol;
+            token_stats.total_supply = new_supply;
+            token_stats.issuer = issuer;
+            token_stats.transfer_locked = transfer_locked;
+        });
+    // Token Already exists, reissuing with new supply
+    } else {
+        statstable.modify(iterator, same_payer, [&](auto& token_stats_record) {
+            token_stats_record.supply.symbol = new_supply.symbol;
+            token_stats_record.total_supply += new_supply;
+            token_stats_record.issuer = issuer;
+            token_stats_record.transfer_locked = transfer_locked;
+        });
+    }
 }
 
 void drtoken::issue(name to,
@@ -40,28 +50,30 @@ void drtoken::issue(name to,
 
     stats statstable(_code, sym.raw());
 
-    auto existing = statstable.find(sym.raw());
-    eosio_assert( existing != statstable.end(),
+    auto iterator = statstable.find(sym.raw());
+    eosio_assert( iterator != statstable.end(),
                   "token with symbol does not exist, create token before issue");
-    const auto& st = *existing;
 
-    require_auth(st.issuer);
+    require_auth(iterator->issuer);
 //    require_auth2(name("amprllc"), name("issue"));
 
     eosio_assert(quantity.is_valid(), "invalid quantity");
     eosio_assert(quantity.amount > 0, "must issue positive quantity");
-    eosio_assert(quantity.symbol == st.supply.symbol, "symbol precision mismatch");
-    eosio_assert( quantity.amount <= st.max_supply.amount - st.supply.amount,
+    eosio_assert(quantity.symbol == iterator->supply.symbol, "symbol precision mismatch");
+    eosio_assert( quantity.amount <= iterator->total_supply.amount - iterator->supply.amount,
                   "quantity exceeds available supply");
 
-    statstable.modify(st, same_payer, [&](auto& s) {
-        s.supply += quantity;
+    statstable.modify(iterator, same_payer, [&](auto& token_stats_record) {
+        token_stats_record.supply += quantity;
     });
 
-    add_balance(st.issuer, quantity, st.issuer);
+    add_balance(iterator->issuer, quantity, iterator->issuer);
 
-    if(to != st.issuer) {
-        SEND_INLINE_ACTION( *this, transfer, {st.issuer,name("active")}, {st.issuer, to, quantity, memo} );
+    if(to != iterator->issuer) {
+        SEND_INLINE_ACTION( *this, 
+                            transfer, 
+                            {iterator->issuer, name("active")},
+                            {iterator->issuer, to, quantity, memo} );
     }
 }
 
@@ -73,17 +85,15 @@ void drtoken::unlock(asset unlock)
     auto symbol_code = unlock.symbol.raw();
     stats statstable(_code, symbol_code);
 
-    auto token = statstable.find(symbol_code);
-    eosio_assert(token != statstable.end(), "token with the symbol doesn't exist");
-
-    const auto &stats_record = *token;
+    auto iterator = statstable.find(symbol_code);
+    eosio_assert(iterator != statstable.end(), "token with the symbol doesn't exist");
 
     // authorization from issuer@issuer is needed eg: amprllc@issuer
     //require_auth((stats_record.issuer, name("issuer"));
-    require_auth(stats_record.issuer);
+    require_auth(iterator->issuer);
 
-    statstable.modify(stats_record, same_payer, [&](auto& srec) {
-        srec.transfer_locked = false;
+    statstable.modify(iterator, same_payer, [&](auto& token_stats_record) {
+        token_stats_record.transfer_locked = false;
     });
 }
 
@@ -101,10 +111,12 @@ void drtoken::transfer(name from,
     auto sym = quantity.symbol;
     stats statstable(_code, sym.raw());
 
-    const auto& st = statstable.get(sym.raw());
+    eosio_assert(statstable.find(quantity.symbol.raw()) != statstable.end(), "token with the symbol doesn't exist");
 
-    if (st.transfer_locked) {
-        require_auth(st.issuer);
+    const auto& token_stats_record = statstable.get(sym.raw());
+
+    if (token_stats_record.transfer_locked) {
+        require_auth(token_stats_record.issuer);
     }
 
 //    require_recipient(from);
@@ -112,7 +124,7 @@ void drtoken::transfer(name from,
 
     eosio_assert(quantity.is_valid(), "invalid quantity");
     eosio_assert(quantity.amount > 0, "must transfer positive quantity");
-    eosio_assert(quantity.symbol == st.supply.symbol, "symbol precision mismatch");
+    eosio_assert(quantity.symbol == token_stats_record.supply.symbol, "symbol precision mismatch");
     eosio_assert(memo.size() <= 256, "memo has more than 256 bytes");
 
     sub_balance(from, quantity);
