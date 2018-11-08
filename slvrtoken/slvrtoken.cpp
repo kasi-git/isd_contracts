@@ -14,7 +14,7 @@ void slvrtoken::create(name issuer,
 //    require_auth2(name("amprllc"), name("create"));
     
     auto sym = new_supply.symbol;
-    eosio_assert(sym.is_valid(), "invalid symbol name");
+    eosio_assert(sym.is_valid(), "invalid symbol name ");
     eosio_assert(new_supply.is_valid(), "invalid supply");
     eosio_assert(new_supply.amount > 0, "max-supply must be positive");
     stats statstable(_code, sym.raw());
@@ -134,31 +134,20 @@ void slvrtoken::transfer(name from,
 void slvrtoken::redeem(name owner,
                        asset quantity)
 {
-eosio::print("***redeem called***");
-    accounts accounts_table(_code, owner.value);
-    const auto& account_object = accounts_table.get(quantity.symbol.raw(), "no balance object found");
 
-    eosio_assert(account_object.balance.amount >= quantity.amount, "can't redeem more tokens than have");
-
-    require_auth(owner);
-
-eosio::print("current balance: ", account_object.balance);
-    if(account_object.balance.amount == quantity.amount) {
-eosio::print("token balance zero");
-        accounts_table.erase(account_object);
-    } else {
-        accounts_table.modify(account_object, owner, [&](auto & obj) {
-            obj.balance -= quantity;
-eosio::print("new balance: ", obj.balance);
-        });
-    }
-
+eosio::print("***redeem called*** ");
+/*
     action(
-        permission_level{_code, name("active")},
-        name("drtokenac"), name("transfer"),
-        std::make_tuple(name("drtokenac"), owner, "10.0000 ADRT",std::string(""))
+        permission_level{get_self(), name("active")},
+        name("drtokenac"), name("redeemtx"),
+        std::make_tuple(name("slvrtokenac"), owner, "10.0000 DRT",std::string(""))
     ).send();
-
+*/
+    action(
+        permission_level{get_self(), "active"_n},
+        "drtokenac"_n, "tx"_n,
+        std::make_tuple(owner,quantity)
+    ).send();
 }
 
 void slvrtoken::sub_balance(name owner,
