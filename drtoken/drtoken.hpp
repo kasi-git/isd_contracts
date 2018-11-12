@@ -26,7 +26,9 @@ namespace ampersand {
                     bool transfer_locked);
 
         [[eosio::action]]
-        void issue(name to, asset quantity, string memo);
+        void issue(name to, 
+                   asset quantity, 
+                   string memo);
 
         [[eosio::action]]
         void unlock(asset unlock);
@@ -36,6 +38,10 @@ namespace ampersand {
                       name to,
                       asset quantity,
                       string memo);
+
+        [[eosio::action]]
+        void drcredit(name to, 
+                      asset quantity);        
 
         inline asset get_supply(symbol sym)const;
 

@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Mon Nov  5 11:08:10 2018",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Mon Nov 12 14:20:47 2018",
     "version": "eosio::abi/1.0",
     "structs": [
         {
@@ -49,6 +49,20 @@
                 {
                     "name": "transfer_locked",
                     "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "drcredit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "to",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
                 }
             ]
         },
@@ -108,6 +122,11 @@
         {
             "name": "create",
             "type": "create",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "drcredit",
+            "type": "drcredit",
             "ricardian_contract": ""
         },
         {

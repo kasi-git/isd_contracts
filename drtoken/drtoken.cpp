@@ -14,7 +14,7 @@ void drtoken::create(name issuer,
 //    require_auth2(name("amprllc"), name("create"));
     
     auto sym = new_supply.symbol;
-    eosio_assert(sym.is_valid(), "invalid symbol name");
+    eosio_assert(sym.is_valid(), "invalid symbol name ");
     eosio_assert(new_supply.is_valid(), "invalid supply");
     eosio_assert(new_supply.amount > 0, "max-supply must be positive");
     stats statstable(_code, sym.raw());
@@ -128,7 +128,21 @@ void drtoken::transfer(name from,
     eosio_assert(memo.size() <= 256, "memo has more than 256 bytes");
 
     sub_balance(from, quantity);
-    add_balance(to, quantity, from);
+    add_balance(to, quantity, from); 
+}
+
+void drtoken::drcredit(name to,
+                       asset quantity)
+{
+    eosio::print("drcredit called ");
+
+    require_auth(name("slvrtokenac"));
+
+    asset drquantity = asset(quantity.amount, symbol("ADRT", 4));
+    sub_balance(name("slvrtokenac"), drquantity);
+    add_balance(to, drquantity, name("slvrtokenac")); 
+
+    eosio::print("drcredit completed");
 }
 
 void drtoken::sub_balance(name owner,
@@ -168,4 +182,4 @@ void drtoken::add_balance(name owner, asset value, name ram_payer)
 
 } /// namespace ampersand
 
-EOSIO_DISPATCH(ampersand::drtoken, (create)(issue)(unlock)(transfer))
+EOSIO_DISPATCH(ampersand::drtoken, (create)(issue)(unlock)(transfer)(drcredit))
