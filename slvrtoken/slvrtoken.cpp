@@ -7,14 +7,14 @@
 namespace ampersand {
 
 void slvrtoken::create(name issuer,
-                     asset new_supply,
-                     bool transfer_locked)
+                       asset new_supply,
+                       bool transfer_locked)
 {
     require_auth(_code);
 //    require_auth2(name("amprllc"), name("create"));
     
     auto sym = new_supply.symbol;
-    eosio_assert(sym.is_valid(), "invalid symbol name ");
+    eosio_assert(sym.is_valid(), "invalid symbol name");
     eosio_assert(new_supply.is_valid(), "invalid supply");
     eosio_assert(new_supply.amount > 0, "max-supply must be positive");
     stats statstable(_code, sym.raw());
@@ -108,12 +108,12 @@ void slvrtoken::transfer(name from,
 
     eosio_assert(is_account(to), "to account does not exist");
 
-    auto sym = quantity.symbol;
-    stats statstable(_code, sym.raw());
+    auto symbol = quantity.symbol;
+    stats statstable(_code, symbol.raw());
 
     eosio_assert(statstable.find(quantity.symbol.raw()) != statstable.end(), "token with the symbol doesn't exist");
 
-    const auto& token_stats_record = statstable.get(sym.raw());
+    const auto& token_stats_record = statstable.get(symbol.raw());
 
     if (token_stats_record.transfer_locked) {
         require_auth(token_stats_record.issuer);
@@ -135,19 +135,57 @@ void slvrtoken::redeem(name owner,
                        asset quantity)
 {
 
-eosio::print("***redeem called*** ");
 /*
     action(
         permission_level{get_self(), name("active")},
-        name("drtokenac"), name("redeemtx"),
-        std::make_tuple(name("slvrtokenac"), owner, "10.0000 DRT",std::string(""))
+        name("drtokenac"), name("drcheck"),
+        std::make_tuple(name("slvrtokenac"), quantity)
+        ///std::make_tuple(name("slvrtokenac"), owner, "10.0000 DRT",std::string(""))
     ).send();
 */
+
+    require_auth(owner);
+
+    // check and remove the redeemed quantity from owner's account 
+    sub_balance(owner, quantity);
+
+    // transfer quantity value DRTokens to owner's account
     action(
-        permission_level{get_self(), "active"_n},
-        "drtokenac"_n, "tx"_n,
-        std::make_tuple(owner,quantity)
+        permission_level{get_self(), name("active")},
+        name("drtokenac"), name("drcredit"),
+        std::make_tuple(owner, quantity)
     ).send();
+
+    eosio::print("dr credited");
+}
+
+void slvrtoken::burn(name owner,
+                     asset quantity)
+{
+    require_auth(owner);
+
+    auto symbol = quantity.symbol;
+    stats statstable(_code, symbol.raw());
+
+    eosio_assert(statstable.find(quantity.symbol.raw()) != statstable.end(), "token with the symbol doesn't exist");
+
+    const auto& token_stats_record = statstable.get(symbol.raw());
+
+    if (token_stats_record.transfer_locked) {
+        require_auth(token_stats_record.issuer);
+    }
+    
+//    require_recipient(from);
+
+    eosio_assert(quantity.is_valid(), "invalid quantity");
+    eosio_assert(quantity.amount > 0, "must burn positive quantity");
+    eosio_assert(quantity.symbol == token_stats_record.supply.symbol, "symbol precision mismatch");
+    
+    statstable.modify(token_stats_record, same_payer, [&](auto& tsr) {
+        tsr.total_supply -= quantity;
+    });
+
+    sub_balance(owner, quantity);
 }
 
 void slvrtoken::sub_balance(name owner,
@@ -187,4 +225,4 @@ void slvrtoken::add_balance(name owner, asset value, name ram_payer)
 
 } /// namespace ampersand
 
-EOSIO_DISPATCH(ampersand::slvrtoken, (create)(issue)(unlock)(redeem)(transfer))
+EOSIO_DISPATCH(ampersand::slvrtoken, (create)(issue)(unlock)(redeem)(transfer)(burn))

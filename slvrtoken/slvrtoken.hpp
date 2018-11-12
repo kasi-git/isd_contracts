@@ -41,6 +41,10 @@ namespace ampersand {
         void redeem(name owner,
                     asset quantity);
 
+        [[eosio::action]]
+        void burn(name owner,
+                  asset quantity);
+
         inline asset get_supply(symbol sym)const;
 
         inline asset get_balance(name owner, symbol sym)const;
