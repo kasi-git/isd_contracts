@@ -15,13 +15,10 @@ namespace ampersand {
 
     using std::string;
 
-    CONTRACT slvrtoken : public eosio::contract {
+    CONTRACT ioutoken : public eosio::contract {
 
     public:
 	using contract::contract;
-
-        const name DRTOKEN_CONTRACT_ACCNAME = name("drtokenac");
-        const name IOUTOKEN_CONTRACT_ACCNAME = name("ioutokenac");
 
         [[eosio::action]]
         void create(name issuer,
@@ -39,10 +36,6 @@ namespace ampersand {
                       name to,
                       asset quantity,
                       string memo);
-
-        [[eosio::action]]
-        void redeem(name owner,
-                    asset quantity);
 
         [[eosio::action]]
         void burn(name owner,
@@ -90,14 +83,14 @@ namespace ampersand {
 
     };
 
-    asset slvrtoken::get_supply( symbol sym )const
+    asset ioutoken::get_supply( symbol sym )const
     {
         stats statstable(_code, sym.raw());
         const auto& st = statstable.get(sym.raw());
          return st.supply;
     }
 
-    asset slvrtoken::get_balance(name owner, symbol sym)const
+    asset ioutoken::get_balance(name owner, symbol sym)const
     {
         accounts accountstable(_code, owner.value);
         const auto& ac = accountstable.get( sym.raw());
@@ -105,4 +98,3 @@ namespace ampersand {
     }
 
 } /// namespace ampersand
-

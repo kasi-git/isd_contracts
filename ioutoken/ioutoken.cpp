@@ -2,11 +2,11 @@
  *  @file
  *  @copyright defined in eos/LICENSE.txt
  */
-#include "slvrtoken.hpp"
+#include "ioutoken.hpp"
 
 namespace ampersand {
 
-void slvrtoken::create(name issuer,
+void ioutoken::create(name issuer,
                        asset new_supply,
                        bool transfer_locked)
 {
@@ -40,7 +40,7 @@ void slvrtoken::create(name issuer,
     }
 }
 
-void slvrtoken::issue(name to,
+void ioutoken::issue(name to,
                     asset quantity,
                     string memo)
 {
@@ -63,20 +63,10 @@ void slvrtoken::issue(name to,
     eosio_assert( quantity.amount <= iterator->total_supply.amount - iterator->supply.amount,
                   "quantity exceeds available supply");
 
-    
-    // destroy IOU tokens from customer account
-    asset iouquantity = asset(quantity.amount, symbol("IOU", 4));
-    action(
-        permission_level{get_self(), name("active")},
-        name(IOUTOKEN_CONTRACT_ACCNAME), name("burn"),
-        std::make_tuple(to, iouquantity)
-    ).send();
-
     statstable.modify(iterator, same_payer, [&](auto& token_stats_record) {
         token_stats_record.supply += quantity;
     });
 
-    // add SLVR tokens to customer account
     add_balance(iterator->issuer, quantity, iterator->issuer);
 
     if(to != iterator->issuer) {
@@ -87,7 +77,7 @@ void slvrtoken::issue(name to,
     }
 }
 
-void slvrtoken::unlock(asset unlock)
+void ioutoken::unlock(asset unlock)
 {
     eosio_assert(unlock.symbol.is_valid(), "invalid symbol name");
     eosio_assert(unlock.is_valid(), "invalid supply");
@@ -107,7 +97,7 @@ void slvrtoken::unlock(asset unlock)
     });
 }
 
-void slvrtoken::transfer(name from,
+void ioutoken::transfer(name from,
                        name to,
                        asset quantity,
                        string memo )
@@ -141,33 +131,19 @@ void slvrtoken::transfer(name from,
     add_balance(to, quantity, from);
 }
 
-void slvrtoken::redeem(name owner,
-                       asset quantity)
+void ioutoken::burn(name owner,
+                    asset quantity)
 {
-    require_auth(owner);
+    eosio::print("ioutokenac burn entered");
 
-    // check and remove the redeemed slvr quantity from owner's account 
-    sub_balance(owner, quantity);
-
-    // transfer quantity size DRTokens to owner's account
-    action(
-        permission_level{get_self(), name("active")},
-        name(DRTOKEN_CONTRACT_ACCNAME), name("drcredit"),
-        std::make_tuple(owner, quantity)
-    ).send();
-
-    eosio::print("dr credited");
-}
-
-void slvrtoken::burn(name owner,
-                     asset quantity)
-{
-    require_auth(owner);
+    // is called from slvrtokenac while issuing SLVR tokens
+    require_auth(name("slvrtokenac"));
 
     auto symbol = quantity.symbol;
     stats statstable(_code, symbol.raw());
 
-    eosio_assert(statstable.find(quantity.symbol.raw()) != statstable.end(), "token with the symbol doesn't exist");
+    eosio_assert(statstable.find(quantity.symbol.raw()) != statstable.end(), 
+                 "token with the symbol doesn't exist");
 
     const auto& token_stats_record = statstable.get(symbol.raw());
 
@@ -188,7 +164,7 @@ void slvrtoken::burn(name owner,
     sub_balance(owner, quantity);
 }
 
-void slvrtoken::sub_balance(name owner,
+void ioutoken::sub_balance(name owner,
                             asset value)
 {
     accounts from_acnts(_code, owner.value);
@@ -200,13 +176,13 @@ void slvrtoken::sub_balance(name owner,
     if(from.balance.amount == value.amount) {
        from_acnts.erase(from);
     } else {
-        from_acnts.modify(from, owner, [&](auto& a) {
+        from_acnts.modify(from, same_payer, [&](auto& a) {
             a.balance -= value;
         });
    }
 }
 
-void slvrtoken::add_balance(name owner, asset value, name ram_payer)
+void ioutoken::add_balance(name owner, asset value, name ram_payer)
 {
     accounts to_acnts(_code, owner.value);
 
@@ -225,4 +201,4 @@ void slvrtoken::add_balance(name owner, asset value, name ram_payer)
 
 } /// namespace ampersand
 
-EOSIO_DISPATCH(ampersand::slvrtoken, (create)(issue)(unlock)(redeem)(transfer)(burn))
+EOSIO_DISPATCH(ampersand::ioutoken, (create)(issue)(unlock)(transfer)(burn))

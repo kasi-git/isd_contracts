@@ -1,13 +1,13 @@
 #
-# cleos commands to work with drtoken
+# cleos commands to work with slvrtoken
 #
 cleos push action slvrtokenac create '["slvrtokenac", "10000.0000 SLVR", true]' -p slvrtokenac
 
 cleos push action slvrtokenac issue '["cust2", "100.0000 SLVR", "memo"]' -p slvrtokenac
 
-cleos push action drtokenac unlock '["3000.0000 SLVRT"]' -p slvrtokenac
+cleos push action slvrtokenac unlock '["3000.0000 SLVRT"]' -p slvrtokenac
 
-cleos push action drtokenac transfer '["cust1", "cust2", "0.0050 SLVRT", "Tx"]' -p cust1
+cleos push action slvrtokenac transfer '["cust1", "cust2", "0.0050 SLVRT", "Tx"]' -p cust1
 
 cleos get currency balance drtokenac cust1
 

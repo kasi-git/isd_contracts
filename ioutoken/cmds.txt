@@ -1,0 +1,11 @@
+#
+# cleos commands to work with ioutoken
+#
+cleos push action ioutokenac create '["ioutokenac", "10000.0000 IOU", true]' -p ioutokenac
+
+cleos push action ioutokenac issue '["cust2", "100.0000 IOU", "memo"]' -p ioutokenac
+
+cleos get currency balance ioutokenac cust1
+
+cleos get table ioutokenac 4,SLVRT stats
+
