@@ -6,7 +6,7 @@
 
 namespace ampersand {
 
-void slvrtoken::create(name issuer,
+ACTION slvrtoken::create(name issuer,
                        asset new_supply,
                        bool transfer_locked)
 {
@@ -40,7 +40,7 @@ void slvrtoken::create(name issuer,
     }
 }
 
-void slvrtoken::issue(name to,
+ACTION slvrtoken::issue(name to,
                     asset quantity,
                     string memo)
 {
@@ -65,7 +65,8 @@ void slvrtoken::issue(name to,
 
     
     // destroy IOU tokens from customer account
-    asset iouquantity = asset(quantity.amount, symbol("IOU", 4));
+    //asset iouquantity = asset(quantity.amount, symbol("IOU", 4));
+    asset iouquantity = asset(quantity.amount, symbol(IOU_TOKEN_NAME, IOU_TOKEN_PRECISION));
     action(
         permission_level{get_self(), name("active")},
         name(IOUTOKEN_CONTRACT_ACCNAME), name("burn"),
@@ -87,7 +88,7 @@ void slvrtoken::issue(name to,
     }
 }
 
-void slvrtoken::unlock(asset unlock)
+ACTION slvrtoken::unlock(asset unlock)
 {
     eosio_assert(unlock.symbol.is_valid(), "invalid symbol name");
     eosio_assert(unlock.is_valid(), "invalid supply");
@@ -107,7 +108,7 @@ void slvrtoken::unlock(asset unlock)
     });
 }
 
-void slvrtoken::transfer(name from,
+ACTION slvrtoken::transfer(name from,
                        name to,
                        asset quantity,
                        string memo )
@@ -141,7 +142,7 @@ void slvrtoken::transfer(name from,
     add_balance(to, quantity, from);
 }
 
-void slvrtoken::redeem(name owner,
+ACTION slvrtoken::redeem(name owner,
                        asset quantity)
 {
     require_auth(owner);
@@ -159,7 +160,7 @@ void slvrtoken::redeem(name owner,
     eosio::print("dr credited");
 }
 
-void slvrtoken::burn(name owner,
+ACTION slvrtoken::burn(name owner,
                      asset quantity)
 {
     require_auth(owner);

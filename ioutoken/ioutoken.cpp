@@ -6,7 +6,7 @@
 
 namespace ampersand {
 
-void ioutoken::create(name issuer,
+ACTION ioutoken::create(name issuer,
                        asset new_supply,
                        bool transfer_locked)
 {
@@ -40,7 +40,7 @@ void ioutoken::create(name issuer,
     }
 }
 
-void ioutoken::issue(name to,
+ACTION ioutoken::issue(name to,
                     asset quantity,
                     string memo)
 {
@@ -77,7 +77,7 @@ void ioutoken::issue(name to,
     }
 }
 
-void ioutoken::unlock(asset unlock)
+ACTION ioutoken::unlock(asset unlock)
 {
     eosio_assert(unlock.symbol.is_valid(), "invalid symbol name");
     eosio_assert(unlock.is_valid(), "invalid supply");
@@ -97,7 +97,7 @@ void ioutoken::unlock(asset unlock)
     });
 }
 
-void ioutoken::transfer(name from,
+ACTION ioutoken::transfer(name from,
                        name to,
                        asset quantity,
                        string memo )
@@ -131,7 +131,7 @@ void ioutoken::transfer(name from,
     add_balance(to, quantity, from);
 }
 
-void ioutoken::burn(name owner,
+ACTION ioutoken::burn(name owner,
                     asset quantity)
 {
     eosio::print("ioutokenac burn entered");

@@ -22,30 +22,26 @@ namespace ampersand {
 
         const name DRTOKEN_CONTRACT_ACCNAME = name("drtokenac");
         const name IOUTOKEN_CONTRACT_ACCNAME = name("ioutokenac");
+        const string IOU_TOKEN_NAME = "IOU";
+        const uint8_t IOU_TOKEN_PRECISION = 4;
 
-        [[eosio::action]]
-        void create(name issuer,
+        ACTION create(name issuer,
                     asset maximum_supply,
                     bool transfer_locked);
 
-        [[eosio::action]]
-        void issue(name to, asset quantity, string memo);
+        ACTION issue(name to, asset quantity, string memo);
 
-        [[eosio::action]]
-        void unlock(asset unlock);
+        ACTION unlock(asset unlock);
 
-        [[eosio::action]]
-        void transfer(name from,
+        ACTION transfer(name from,
                       name to,
                       asset quantity,
                       string memo);
 
-        [[eosio::action]]
-        void redeem(name owner,
+        ACTION redeem(name owner,
                     asset quantity);
 
-        [[eosio::action]]
-        void burn(name owner,
+        ACTION burn(name owner,
                   asset quantity);
 
         inline asset get_supply(symbol sym)const;
@@ -54,7 +50,7 @@ namespace ampersand {
 
     private:
 
-        struct [[eosio::table]]  account {
+        TABLE account {
             asset balance;
 
             uint64_t primary_key()const { return balance.symbol.raw(); }
@@ -62,7 +58,7 @@ namespace ampersand {
             EOSLIB_SERIALIZE(account, (balance))
         };
 
-        struct [[eosio::table]] currency_stats {
+        TABLE currency_stats {
             asset supply;
             asset total_supply;
             name issuer;

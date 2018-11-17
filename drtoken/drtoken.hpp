@@ -20,27 +20,22 @@ namespace ampersand {
     public:
 	using contract::contract;
 
-        [[eosio::action]]
-        void create(name issuer,
+        ACTION create(name issuer,
                     asset maximum_supply,
                     bool transfer_locked);
 
-        [[eosio::action]]
-        void issue(name to, 
+        ACTION issue(name to, 
                    asset quantity, 
                    string memo);
 
-        [[eosio::action]]
-        void unlock(asset unlock);
+        ACTION unlock(asset unlock);
 
-        [[eosio::action]]
-        void transfer(name from,
+        ACTION transfer(name from,
                       name to,
                       asset quantity,
                       string memo);
 
-        [[eosio::action]]
-        void drcredit(name to, 
+        ACTION drcredit(name to, 
                       asset quantity);        
 
         inline asset get_supply(symbol sym)const;
@@ -49,7 +44,7 @@ namespace ampersand {
 
     private:
 
-        struct [[eosio::table]]  account {
+        TABLE account {
             asset balance;
 
             uint64_t primary_key()const { return balance.symbol.raw(); }
@@ -57,7 +52,7 @@ namespace ampersand {
             EOSLIB_SERIALIZE(account, (balance))
         };
 
-        struct [[eosio::table]] currency_stats {
+        TABLE currency_stats {
             asset supply;
             asset total_supply;
             name issuer;

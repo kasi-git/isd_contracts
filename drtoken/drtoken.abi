@@ -1,6 +1,6 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Mon Nov 12 14:20:47 2018",
-    "version": "eosio::abi/1.0",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Sat Nov 17 16:16:03 2018",
+    "version": "eosio::abi/1.1",
     "structs": [
         {
             "name": "account",
@@ -162,5 +162,6 @@
         }
     ],
     "ricardian_clauses": [],
+    "variants": [],
     "abi_extensions": []
 }
