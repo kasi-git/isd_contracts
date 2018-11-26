@@ -20,33 +20,30 @@ namespace ampersand {
     public:
 	using contract::contract;
 
-        const name DRTOKEN_CONTRACT_ACCNAME = name("drtokenac");
-        const name IOUTOKEN_CONTRACT_ACCNAME = name("ioutokenac");
+        const name DRTOKEN_CONTRACT_ACCNAME = name("amperdrstokn");
+        const name IOUTOKEN_CONTRACT_ACCNAME = name("amperioutokn");
         const string IOU_TOKEN_NAME = "IOU";
         const uint8_t IOU_TOKEN_PRECISION = 4;
 
-        ACTION create(name issuer,
-                    asset maximum_supply,
-                    bool transfer_locked);
+        ACTION create( name issuer, asset maximum_supply,
+                       uint32_t slvr_per_token_mg, bool transfer_locked );
 
-        ACTION issue(name to, asset quantity, string memo);
+        ACTION issue( name to, asset quantity, string memo );
 
-        ACTION unlock(asset unlock);
+        ACTION lock( asset lock );
 
-        ACTION transfer(name from,
-                      name to,
-                      asset quantity,
-                      string memo);
+        ACTION unlock( asset unlock );
 
-        ACTION redeem(name owner,
-                    asset quantity);
+        ACTION transfer( name from, name to,
+                         asset quantity, string memo );
 
-        ACTION burn(name owner,
-                  asset quantity);
+        ACTION redeem( name owner, asset quantity );
 
-        inline asset get_supply(symbol sym)const;
+        ACTION burn( name owner, asset quantity );
 
-        inline asset get_balance(name owner, symbol sym)const;
+        inline asset get_supply( symbol sym )const;
+
+        inline asset get_balance( name owner, symbol sym )const;
 
     private:
 
@@ -55,18 +52,19 @@ namespace ampersand {
 
             uint64_t primary_key()const { return balance.symbol.raw(); }
 
-            EOSLIB_SERIALIZE(account, (balance))
+            EOSLIB_SERIALIZE( account, (balance) )
         };
 
         TABLE currency_stats {
             asset supply;
             asset total_supply;
             name issuer;
+            uint32_t slvr_per_token_mg; // # of milligrams of silver per token
             bool transfer_locked;
 
             uint64_t primary_key()const { return supply.symbol.raw(); }
 
-            EOSLIB_SERIALIZE(currency_stats, (supply)(total_supply)(issuer)(transfer_locked))
+            EOSLIB_SERIALIZE( currency_stats, (supply)(total_supply)(issuer)(transfer_locked) )
         };
 
         typedef eosio::multi_index<"accounts"_n, account> accounts;
@@ -88,17 +86,16 @@ namespace ampersand {
 
     asset slvrtoken::get_supply( symbol sym )const
     {
-        stats statstable(_code, sym.raw());
-        const auto& st = statstable.get(sym.raw());
+        stats statstable( _code, sym.raw() );
+        const auto& st = statstable.get( sym.raw() );
          return st.supply;
     }
 
-    asset slvrtoken::get_balance(name owner, symbol sym)const
+    asset slvrtoken::get_balance( name owner, symbol sym )const
     {
-        accounts accountstable(_code, owner.value);
-        const auto& ac = accountstable.get( sym.raw());
+        accounts accountstable( _code, owner.value );
+        const auto& ac = accountstable.get( sym.raw() );
         return ac.balance;
     }
 
 } /// namespace ampersand
-

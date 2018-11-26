@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Sat Nov 17 16:13:51 2018",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Thu Nov 22 13:12:20 2018",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -39,6 +39,10 @@
                     "type": "asset"
                 },
                 {
+                    "name": "slvr_per_token_mg",
+                    "type": "uint32"
+                },
+                {
                     "name": "transfer_locked",
                     "type": "bool"
                 }
@@ -61,6 +65,10 @@
                     "type": "name"
                 },
                 {
+                    "name": "slvr_per_token_mg",
+                    "type": "uint32"
+                },
+                {
                     "name": "transfer_locked",
                     "type": "bool"
                 }
@@ -81,6 +89,16 @@
                 {
                     "name": "memo",
                     "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "lock",
+            "base": "",
+            "fields": [
+                {
+                    "name": "lock",
+                    "type": "asset"
                 }
             ]
         },
@@ -146,6 +164,11 @@
         {
             "name": "issue",
             "type": "issue",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "lock",
+            "type": "lock",
             "ricardian_contract": ""
         },
         {

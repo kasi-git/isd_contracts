@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Sat Nov 17 16:16:03 2018",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Fri Nov 23 14:26:44 2018",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -85,6 +85,16 @@
             ]
         },
         {
+            "name": "lock",
+            "base": "",
+            "fields": [
+                {
+                    "name": "lock",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
             "name": "transfer",
             "base": "",
             "fields": [
@@ -132,6 +142,11 @@
         {
             "name": "issue",
             "type": "issue",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "lock",
+            "type": "lock",
             "ricardian_contract": ""
         },
         {

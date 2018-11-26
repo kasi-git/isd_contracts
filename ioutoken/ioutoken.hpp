@@ -20,25 +20,25 @@ namespace ampersand {
     public:
 	using contract::contract;
 
-        ACTION create(name issuer,
-                    asset maximum_supply,
-                    bool transfer_locked);
+        const name SLVRTOKEN_CONTRACT_ACCNAME = name("amperslvtokn");
 
-        ACTION issue(name to, asset quantity, string memo);
+        ACTION create( name issuer, asset new_supply,
+                       bool transfer_locked = true );
 
-        ACTION unlock(asset unlock);
+        ACTION issue( name to, asset quantity, string memo );
 
-        ACTION transfer(name from,
-                      name to,
-                      asset quantity,
-                      string memo);
+        ACTION lock( asset lock );
 
-        ACTION burn(name owner,
-                  asset quantity);
+        ACTION unlock( asset unlock );
 
-        inline asset get_supply(symbol sym)const;
+        ACTION transfer( name from, name to,
+                         asset quantity, string memo );
 
-        inline asset get_balance(name owner, symbol sym)const;
+        ACTION burn( name owner, asset quantity );
+
+        inline asset get_supply( symbol sym )const;
+
+        inline asset get_balance( name owner, symbol sym )const;
 
     private:
 
@@ -47,7 +47,7 @@ namespace ampersand {
 
             uint64_t primary_key()const { return balance.symbol.raw(); }
 
-            EOSLIB_SERIALIZE(account, (balance))
+            EOSLIB_SERIALIZE( account, (balance) )
         };
 
         TABLE currency_stats {
@@ -58,7 +58,7 @@ namespace ampersand {
 
             uint64_t primary_key()const { return supply.symbol.raw(); }
 
-            EOSLIB_SERIALIZE(currency_stats, (supply)(total_supply)(issuer)(transfer_locked))
+            EOSLIB_SERIALIZE( currency_stats, (supply)(total_supply)(issuer)(transfer_locked) )
         };
 
         typedef eosio::multi_index<"accounts"_n, account> accounts;
@@ -85,7 +85,7 @@ namespace ampersand {
          return st.supply;
     }
 
-    asset ioutoken::get_balance(name owner, symbol sym)const
+    asset ioutoken::get_balance( name owner, symbol sym )const
     {
         accounts accountstable(_code, owner.value);
         const auto& ac = accountstable.get( sym.raw());

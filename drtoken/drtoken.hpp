@@ -20,27 +20,27 @@ namespace ampersand {
     public:
 	using contract::contract;
 
-        ACTION create(name issuer,
-                    asset maximum_supply,
-                    bool transfer_locked);
+        const name SLVRTOKEN_CONTRACT_ACCNAME = name("amperslvtokn");
+        const string DR_TOKEN_NAME = "ADR";
+        const uint8_t DR_TOKEN_PRECISION = 4;
 
-        ACTION issue(name to, 
-                   asset quantity, 
-                   string memo);
+        ACTION create( name issuer, asset maximum_supply, 
+                       bool transfer_locked = true );
 
-        ACTION unlock(asset unlock);
+        ACTION issue( name to, asset quantity, string memo );
 
-        ACTION transfer(name from,
-                      name to,
-                      asset quantity,
-                      string memo);
+        ACTION lock( asset lock );
 
-        ACTION drcredit(name to, 
-                      asset quantity);        
+        ACTION unlock( asset unlock );
 
-        inline asset get_supply(symbol sym)const;
+        ACTION transfer( name from, name to,
+                      asset quantity, string memo );
 
-        inline asset get_balance(name owner, symbol sym)const;
+        ACTION drcredit( name to, asset quantity ); 
+
+        inline asset get_supply( symbol sym )const;
+
+        inline asset get_balance( name owner, symbol sym )const;
 
     private:
 
@@ -49,7 +49,7 @@ namespace ampersand {
 
             uint64_t primary_key()const { return balance.symbol.raw(); }
 
-            EOSLIB_SERIALIZE(account, (balance))
+            EOSLIB_SERIALIZE( account, (balance) )
         };
 
         TABLE currency_stats {
@@ -60,7 +60,7 @@ namespace ampersand {
 
             uint64_t primary_key()const { return supply.symbol.raw(); }
 
-            EOSLIB_SERIALIZE(currency_stats, (supply)(total_supply)(issuer)(transfer_locked))
+            EOSLIB_SERIALIZE( currency_stats, (supply)(total_supply)(issuer)(transfer_locked) )
         };
 
         typedef eosio::multi_index<"accounts"_n, account> accounts;
@@ -82,15 +82,15 @@ namespace ampersand {
 
     asset drtoken::get_supply( symbol sym )const
     {
-        stats statstable(_code, sym.raw());
-        const auto& st = statstable.get(sym.raw());
+        stats statstable( _code, sym.raw() );
+        const auto& st = statstable.get( sym.raw() );
          return st.supply;
     }
 
-    asset drtoken::get_balance(name owner, symbol sym)const
+    asset drtoken::get_balance( name owner, symbol sym )const
     {
-        accounts accountstable(_code, owner.value);
-        const auto& ac = accountstable.get( sym.raw());
+        accounts accountstable( _code, owner.value );
+        const auto& ac = accountstable.get( sym.raw() );
         return ac.balance;
     }
 
