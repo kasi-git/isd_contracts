@@ -1,0 +1,32 @@
+// ram purchase
+cleos --url http://jungle2.eosdac.io:8882 system buyram  amperioutokn amperioutokn "20 EOS"
+
+// contract deploy
+cleos --url http://jungle2.eosdac.io:8882 set contract amperioutokn ioutoken/
+
+// create IOU tokens
+cleos --url http://jungle2.eosdac.io:8882 push action amperioutokn create '{"issuer":"amperioutokn","new_supply":"1000000.0000 IOU","transfer_locked":true}' -p amperioutokn
+
+// view stats table 
+cleos --url http://jungle2.eosdac.io:8882 get table amperioutokn 4,IOU stats
+
+// issue quantity more than created
+cleos --url http://jungle2.eosdac.io:8882 push action amperioutokn issue '{"to":"ampe rioutokn","quantity":"1000009.0000 IOU","memo":"issue"}'  -p amperioutokn  
+
+// issue 10.0000 IOU tokens to ampercust111
+cleos --url http://jungle2.eosdac.io:8882 push action amperioutokn issue '{"to":"ampercust111","quantity":"10.0000 IOU","memo":"issue"}'  -p amperioutokn
+
+// lock
+cleos --url http://jungle2.eosdac.io:8882 push action amperioutokn lock '{"lock":"1000000.0000 IOU"}'  -p amperioutokn
+
+// unlock
+cleos --url http://jungle2.eosdac.io:8882 push action amperioutokn unlock '{"unlock":"1000000.0000 IOU"}'  -p amperioutokn
+
+// transfer: fails unless signed by amperioutokn
+cleos --url http://jungle2.eosdac.io:8882 push action amperioutokn transfer '{"from":"ampercust111","to":"ampercust222","quantity":"10.0000 IOU","memo":"Tx"}' -p ampercust111
+
+// burn: fails unless signed by amperslvtokn
+cleos --url http://jungle2.eosdac.io:8882 push action amperioutokn burn  '{"owner":"ampercust111","quantity":"10.0000 IOU"}' -p ampercust111
+
+
+

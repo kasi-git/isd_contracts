@@ -1,0 +1,36 @@
+// ram purchase
+cleos --url http://jungle2.eosdac.io:8882 system buyram amperslvtokn amperslvtokn "20 EOS"
+
+// deploy contract
+cleos --url http://jungle2.eosdac.io:8882 set contract amperslvtokn slvrtoken/
+
+// create SLVR tokens
+cleos --url http://jungle2.eosdac.io:8882 push action amperslvtokn create '{"issuer":"amperslvtokn","new_supply":"1000000.0000 SLVR","slvr_per_token_mg":2000,"transfer_locked":true}' -p amperslvtokn
+
+// view stats table 
+cleos --url http://jungle2.eosdac.io:8882 get table amperslvtokn 4,SLVR stats
+
+// issue quantity more than created
+cleos --url http://jungle2.eosdac.io:8882 push action amperslvtokn issue '{"to":"ampe rslvtokn","quantity":"1000009.0000 SLVR","memo":"issue"}'  -p amperslvtokn  
+
+// issue 10.0000 SLVR tokens to ampercust111
+cleos --url http://jungle2.eosdac.io:8882 push action amperslvtokn issue '{"to":"ampercust111","quantity":"10.0000 SLVR","memo":"issue"}'  -p amperslvtokn
+
+// redeem slvr tokens
+cleos --url http://jungle2.eosdac.io:8882 push action amperslvtokn redeem '{"owner":"ampercust111","quantity":"10.0000 SLVR"}' -p ampercust111
+
+
+// lock
+cleos --url http://jungle2.eosdac.io:8882 push action amperslvtokn lock '{"lock":"1000000.0000 SLVR"}'  -p amperslvtokn
+
+// unlock
+cleos --url http://jungle2.eosdac.io:8882 push action amperslvtokn unlock '{"unlock":"1000000.0000 SLVR"}'  -p amperslvtokn
+
+// transfer: fails unless signed by amperslvtokn
+cleos --url http://jungle2.eosdac.io:8882 push action amperslvtokn transfer '{"from":"ampercust111","to":"ampercust222","quantity":"10.0000 SLVR","memo":"Tx"}' -p ampercust111
+
+// burn: fails unless signed by amperslvtokn
+cleos --url http://jungle2.eosdac.io:8882 push action amperslvtokn burn  '{"owner":"ampercust111","quantity":"10.0000 SLVR"}' -p ampercust111
+
+
+

@@ -25,8 +25,8 @@ namespace ampersand {
         const string IOU_TOKEN_NAME = "IOU";
         const uint8_t IOU_TOKEN_PRECISION = 4;
 
-        ACTION create( name issuer, asset maximum_supply,
-                       uint32_t slvr_per_token_mg, bool transfer_locked );
+        ACTION create( name issuer, asset new_supply,
+                       uint16_t slvr_per_token_mg, bool transfer_locked );
 
         ACTION issue( name to, asset quantity, string memo );
 
@@ -59,12 +59,13 @@ namespace ampersand {
             asset supply;
             asset total_supply;
             name issuer;
-            uint32_t slvr_per_token_mg; // # of milligrams of silver per token
+            uint16_t slvr_per_token_mg; // # of milligrams of silver per token
             bool transfer_locked;
 
             uint64_t primary_key()const { return supply.symbol.raw(); }
 
-            EOSLIB_SERIALIZE( currency_stats, (supply)(total_supply)(issuer)(transfer_locked) )
+            EOSLIB_SERIALIZE( currency_stats, (supply)(total_supply)(issuer)
+                                              (slvr_per_token_mg)(transfer_locked) )
         };
 
         typedef eosio::multi_index<"accounts"_n, account> accounts;

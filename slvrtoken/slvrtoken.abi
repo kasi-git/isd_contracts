@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Thu Nov 22 13:12:20 2018",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Nov 28 12:19:22 2018",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -35,12 +35,12 @@
                     "type": "name"
                 },
                 {
-                    "name": "maximum_supply",
+                    "name": "new_supply",
                     "type": "asset"
                 },
                 {
                     "name": "slvr_per_token_mg",
-                    "type": "uint32"
+                    "type": "uint16"
                 },
                 {
                     "name": "transfer_locked",
@@ -66,7 +66,7 @@
                 },
                 {
                     "name": "slvr_per_token_mg",
-                    "type": "uint32"
+                    "type": "uint16"
                 },
                 {
                     "name": "transfer_locked",

@@ -1,0 +1,32 @@
+// purchase ram
+cleos --url http://jungle.cryptolions.io:18888 system buyram amperdrstokn amperdrstokn "20 EOS"
+
+// deploy contract
+cleos --url http://jungle.cryptolions.io:18888 set contract amperdrstokn drtoken/
+
+// create ADR tokens
+cleos --url http://jungle.cryptolions.io:38888 push action amperdrstokn create '{"issuer":"amperdrstokn","new_supply":"1000000.0000 ADR","transfer_locked":true}' -p amperdrstokn
+
+// view stats table 
+cleos --url http://jungle.cryptolions.io:38888 get table amperdrstokn 4,ADR stats
+
+// issue quantity more than created
+cleos --url http://jungle.cryptolions.io:38888 push action amperdrstokn issue '{"to":"ampe rdrstokn","quantity":"1000009.0000 ADR","memo":"issue"}'  -p amperdrstokn  
+
+// issue 10.0000 ADR tokens to ampercust111
+cleos --url http://jungle.cryptolions.io:38888 push action amperdrstokn issue '{"to":"ampercust111","quantity":"10.0000 ADR","memo":"issue"}'  -p amperdrstokn
+
+// lock
+cleos --url http://jungle.cryptolions.io:38888 push action amperdrstokn lock '{"lock":"1000000.0000 ADR"}'  -p amperdrstokn
+
+// unlock
+cleos --url http://jungle.cryptolions.io:38888 push action amperdrstokn unlock '{"unlock":"1000000.0000 ADR"}'  -p amperdrstokn
+
+// transfer: fails unless signed by amperdrstokn
+cleos --url http://jungle.cryptolions.io:38888 push action amperdrstokn transfer '{"from":"ampercust111","to":"ampercust222","quantity":"10.0000 ADR","memo":"Tx"}' -p ampercust111
+
+// burn: fails unless signed by amperslvtokn
+cleos --url http://jungle.cryptolions.io:38888 push action amperdrstokn burn  '{"owner":"ampercust111","quantity":"10.0000 ADR"}' -p ampercust111
+
+
+

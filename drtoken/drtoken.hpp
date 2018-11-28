@@ -24,7 +24,7 @@ namespace ampersand {
         const string DR_TOKEN_NAME = "ADR";
         const uint8_t DR_TOKEN_PRECISION = 4;
 
-        ACTION create( name issuer, asset maximum_supply, 
+        ACTION create( name issuer, asset new_supply, 
                        bool transfer_locked = true );
 
         ACTION issue( name to, asset quantity, string memo );

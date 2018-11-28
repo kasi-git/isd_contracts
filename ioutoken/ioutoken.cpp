@@ -164,10 +164,6 @@ ACTION ioutoken::burn( name owner, asset quantity )
 
     const auto& token_stats_record = statstable.get( symbol.raw() );
 
-    if ( token_stats_record.transfer_locked ) {
-        require_auth( token_stats_record.issuer );
-    }
-    
 //    require_recipient(from);
 
     eosio_assert( quantity.is_valid(), "invalid quantity" );
@@ -176,6 +172,7 @@ ACTION ioutoken::burn( name owner, asset quantity )
                   "symbol precision mismatch" );
     
     statstable.modify( token_stats_record, same_payer, [&](auto& tsr) {
+        tsr.supply -= quantity;
         tsr.total_supply -= quantity;
     } );
 

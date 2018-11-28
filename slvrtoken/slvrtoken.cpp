@@ -7,7 +7,7 @@
 namespace ampersand {
 
 ACTION slvrtoken::create( name issuer, asset new_supply, 
-                          uint32_t slvr_per_token_mg, bool transfer_locked )
+                          uint16_t slvr_per_token_mg, bool transfer_locked )
 {
     require_auth( _code );
 //    require_auth2(name("amprllc"), name("create"));
@@ -168,8 +168,11 @@ ACTION slvrtoken::redeem( name owner, asset quantity )
 {
     require_auth( owner );
 
-    // check and reduce the redeemed slvr quantity from owner's account 
-    sub_balance( owner, quantity );
+    // burn the slvr tokens
+    SEND_INLINE_ACTION( *this, 
+                        burn, 
+                        {owner, name("active")},
+                        {owner, quantity} );
 
     // transfer quantity size DRTokens to owner's account
     action(
@@ -193,10 +196,6 @@ ACTION slvrtoken::burn( name owner, asset quantity )
 
     const auto& token_stats_record = statstable.get(symbol.raw());
 
-    if (token_stats_record.transfer_locked) {
-        require_auth(token_stats_record.issuer);
-    }
-    
 //    require_recipient(from);
 
     eosio_assert( quantity.is_valid(), "invalid quantity" );
@@ -205,6 +204,7 @@ ACTION slvrtoken::burn( name owner, asset quantity )
                   "symbol precision mismatch");
     
     statstable.modify( token_stats_record, same_payer, [&](auto& tsr) {
+        tsr.supply -= quantity;
         tsr.total_supply -= quantity;
     } );
 
