@@ -1,15 +1,28 @@
 #
 # cleos commands to work with slvrtoken
 #
-cleos push action slvrtokenac create '["slvrtokenac", "10000.0000 SLVR", true]' -p slvrtokenac
+// build
+eosio-cpp slvrtoken.cpp -o slvrtoken.wasm --abigen
+
+OR => 
+
+cmake .
+make
+
+// add eosio.code permission to slvrtokencontract's active permission
+cleos set account permission amperslvcont active '{ "threshold": 1, "keys": [ { "key": "EOS5CMwziTNPnn3g2X7V
+kRKT77tecsushPLz1rCBDCVRjTucZDk2T", "weight": 1 } ], "accounts": [ { "permission": { "actor": "amperslvcont", "perm
+ission": "eosio.code" }, "weight": 1 } ] }'
+
+cleos push action slvrtokenac create '["slvrtokenac", "10000.0000 SLVR", true, true]' -p slvrtokenac
 
 cleos push action slvrtokenac issue '["cust2", "100.0000 SLVR", "memo"]' -p slvrtokenac
 
-cleos push action slvrtokenac unlock '["3000.0000 SLVRT"]' -p slvrtokenac
+cleos push action slvrtokenac unlock '["3000.0000 SLVR"]' -p slvrtokenac
 
-cleos push action slvrtokenac transfer '["cust1", "cust2", "0.0050 SLVRT", "Tx"]' -p cust1
+cleos push action slvrtokenac transfer '["cust1", "cust2", "0.0050 SLVR", "Tx"]' -p cust1
 
-cleos get currency balance drtokenac cust1
+cleos get currency balance slvrtokenac cust1
 
-cleos get table drtokenac 4,SLVRT stats
+cleos get table slvrtokenac 4,SLVR stats
 

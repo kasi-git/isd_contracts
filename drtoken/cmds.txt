@@ -1,14 +1,22 @@
 #
-# cleos commands to work with drtoken
+# cleos commands to work with drtoken on local test node
 #
-cleos push action drtokenac create '["slvrtokenac", "10000.0000 SLVRAC", true]' -p drtokenac
+//build
+eosio-cpp drtoken.cpp -o drtoken.wasm --abigen
 
-cleos push action drtokenac issue '["cust2", "100.0000 SLVRT", "memo"]' -p slvrtokenac
+OR => 
 
-cleos push action drtokenac unlock '["3000.0000 SLVRT"]' -p slvrtokenac
+cmake .
+make
 
-cleos push action drtokenac transfer '["cust1", "cust2", "0.0050 SLVRT", "Tx"]' -p cust1
+cleos push action drtokenac create '["slvrtokenac", "10000.0000 ADR", true]' -p drtokenac
+
+cleos push action drtokenac issue '["slvrtokenac", "10000.0000 ADR", "memo"]' -p slvrtokenac
+
+cleos push action drtokenac unlock '["3000.0000 ADR"]' -p slvrtokenac
+
+cleos push action drtokenac transfer '["cust1", "cust2", "0.0050 ADR", "Tx"]' -p cust1
 
 cleos get currency balance drtokenac cust1
 
-cleos get table drtokenac 4,SLVRT stats
+cleos get table drtokenac 4,ADR stats

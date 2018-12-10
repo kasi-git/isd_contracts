@@ -9,7 +9,7 @@
   "accounts": [
     {
       "permission": {
-        "actor": "amperslvtokn",
+        "actor": "amperslvcont",
         "permission": "eosio.code"
       },
       "weight": 1

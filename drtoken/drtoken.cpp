@@ -149,8 +149,6 @@ void drtoken::transfer( name from, name to,
 
 void drtoken::drcredit( name to, asset quantity )
 {
-    eosio::print("drcredit called ");
-
     require_auth( SLVRTOKEN_CONTRACT_ACCNAME );
 
     asset drquantity = asset( quantity.amount, 
@@ -158,8 +156,6 @@ void drtoken::drcredit( name to, asset quantity )
 
     sub_balance( SLVRTOKEN_CONTRACT_ACCNAME, drquantity );
     add_balance(to, drquantity, SLVRTOKEN_CONTRACT_ACCNAME ); 
-
-    eosio::print("drcredit completed");
 }
 
 void drtoken::sub_balance( name owner, asset value )

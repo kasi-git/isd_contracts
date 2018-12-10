@@ -20,19 +20,23 @@ namespace ampersand {
     public:
 	using contract::contract;
 
-        const name DRTOKEN_CONTRACT_ACCNAME = name("amperdrstokn");
-        const name IOUTOKEN_CONTRACT_ACCNAME = name("amperioutokn");
+        const name DRTOKEN_CONTRACT_ACCNAME = name("amperdrscont");
+        const name IOUTOKEN_CONTRACT_ACCNAME = name("amperioucont");
         const string IOU_TOKEN_NAME = "IOU";
         const uint8_t IOU_TOKEN_PRECISION = 4;
 
-        ACTION create( name issuer, asset new_supply,
-                       uint16_t slvr_per_token_mg, bool transfer_locked );
+        ACTION create( name issuer, asset new_supply, uint16_t slvr_per_token_mg, 
+                   bool transfer_locked = true, bool redeem_locked = true );
 
         ACTION issue( name to, asset quantity, string memo );
 
         ACTION lock( asset lock );
 
         ACTION unlock( asset unlock );
+
+        ACTION redeemlock( asset lock );
+
+        ACTION redeemunlock( asset unlock );
 
         ACTION transfer( name from, name to,
                          asset quantity, string memo );
@@ -61,11 +65,12 @@ namespace ampersand {
             name issuer;
             uint16_t slvr_per_token_mg; // # of milligrams of silver per token
             bool transfer_locked;
+            bool redeem_locked;
 
             uint64_t primary_key()const { return supply.symbol.raw(); }
 
             EOSLIB_SERIALIZE( currency_stats, (supply)(total_supply)(issuer)
-                                              (slvr_per_token_mg)(transfer_locked) )
+                               (slvr_per_token_mg)(transfer_locked)(redeem_locked) )
         };
 
         typedef eosio::multi_index<"accounts"_n, account> accounts;

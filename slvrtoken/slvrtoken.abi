@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Nov 28 12:19:22 2018",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Fri Dec  7 08:29:21 2018",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -45,6 +45,10 @@
                 {
                     "name": "transfer_locked",
                     "type": "bool"
+                },
+                {
+                    "name": "redeem_locked",
+                    "type": "bool"
                 }
             ]
         },
@@ -70,6 +74,10 @@
                 },
                 {
                     "name": "transfer_locked",
+                    "type": "bool"
+                },
+                {
+                    "name": "redeem_locked",
                     "type": "bool"
                 }
             ]
@@ -112,6 +120,26 @@
                 },
                 {
                     "name": "quantity",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "redeemlock",
+            "base": "",
+            "fields": [
+                {
+                    "name": "lock",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "redeemunlock",
+            "base": "",
+            "fields": [
+                {
+                    "name": "unlock",
                     "type": "asset"
                 }
             ]
@@ -174,6 +202,16 @@
         {
             "name": "redeem",
             "type": "redeem",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "redeemlock",
+            "type": "redeemlock",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "redeemunlock",
+            "type": "redeemunlock",
             "ricardian_contract": ""
         },
         {

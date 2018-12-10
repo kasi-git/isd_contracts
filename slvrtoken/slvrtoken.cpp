@@ -7,7 +7,8 @@
 namespace ampersand {
 
 ACTION slvrtoken::create( name issuer, asset new_supply, 
-                          uint16_t slvr_per_token_mg, bool transfer_locked )
+                          uint16_t slvr_per_token_mg, 
+                          bool transfer_locked, bool redeem_locked )
 {
     require_auth( _code );
 //    require_auth2(name("amprllc"), name("create"));
@@ -30,6 +31,7 @@ ACTION slvrtoken::create( name issuer, asset new_supply,
             token_stats_record.issuer = issuer;
             token_stats_record.slvr_per_token_mg = slvr_per_token_mg;
             token_stats_record.transfer_locked = transfer_locked;
+            token_stats_record.redeem_locked = redeem_locked;
         } );
     // Token Already exists, reissuing with new supply
     } else {
@@ -38,6 +40,7 @@ ACTION slvrtoken::create( name issuer, asset new_supply,
             token_stats_record.issuer = issuer;
             token_stats_record.slvr_per_token_mg = slvr_per_token_mg;
             token_stats_record.transfer_locked = transfer_locked;
+            token_stats_record.redeem_locked = redeem_locked;
         } );
     }
 }
@@ -130,6 +133,48 @@ ACTION slvrtoken::unlock( asset unlock )
     } );
 }
 
+ACTION slvrtoken::redeemlock( asset lock )
+{
+    eosio_assert( lock.symbol.is_valid(), "invalid symbol name" );
+    eosio_assert( lock.is_valid(), "invalid supply" );
+
+    auto symbol_code = lock.symbol.raw();
+    stats statstable( _code, symbol_code );
+
+    auto iterator = statstable.find( symbol_code );
+    eosio_assert( iterator != statstable.end(), 
+                  "token with the symbol doesn't exist");
+
+    // authorization from issuer@issuer is needed eg: amprllc@issuer
+    //require_auth((stats_record.issuer, name("issuer"));
+    require_auth( iterator->issuer );
+
+    statstable.modify( iterator, same_payer, [&](auto& token_stats_record) {
+        token_stats_record.redeem_locked = true;
+    } );
+}
+
+ACTION slvrtoken::redeemunlock( asset unlock )
+{
+    eosio_assert( unlock.symbol.is_valid(), "invalid symbol name" );
+    eosio_assert( unlock.is_valid(), "invalid supply" );
+
+    auto symbol_code = unlock.symbol.raw();
+    stats statstable( _code, symbol_code );
+
+    auto iterator = statstable.find( symbol_code );
+    eosio_assert( iterator != statstable.end(), 
+                  "token with the symbol doesn't exist" );
+
+    // authorization from issuer@issuer is needed eg: amprllc@issuer
+    //require_auth((stats_record.issuer, name("issuer"));
+    require_auth(iterator->issuer);
+
+    statstable.modify( iterator, same_payer, [&](auto& token_stats_record) {
+        token_stats_record.redeem_locked = false;
+    } );
+}
+
 ACTION slvrtoken::transfer( name from, name to,
                             asset quantity, string memo )
 {
@@ -168,6 +213,18 @@ ACTION slvrtoken::redeem( name owner, asset quantity )
 {
     require_auth( owner );
 
+    auto symbol = quantity.symbol;
+    stats statstable( _code, symbol.raw() );
+
+    eosio_assert( statstable.find( symbol.raw()) != statstable.end(), 
+                  "token with the symbol doesn't exist");
+
+    const auto& token_stats_record = statstable.get( symbol.raw() );
+
+    if (token_stats_record.redeem_locked) {
+        require_auth(token_stats_record.issuer);
+    }
+
     // burn the slvr tokens
     SEND_INLINE_ACTION( *this, 
                         burn, 
@@ -180,8 +237,6 @@ ACTION slvrtoken::redeem( name owner, asset quantity )
         name(DRTOKEN_CONTRACT_ACCNAME), name("drcredit"),
         std::make_tuple(owner, quantity)
     ).send();
-
-    eosio::print("dr credited");
 }
 
 ACTION slvrtoken::burn( name owner, asset quantity )
@@ -247,4 +302,6 @@ void slvrtoken::add_balance( name owner, asset value, name ram_payer )
 
 } /// namespace ampersand
 
-EOSIO_DISPATCH(ampersand::slvrtoken, (create)(issue)(lock)(unlock)(redeem)(transfer)(burn))
+///EOSIO_DISPATCH(ampersand::slvrtoken, (create)(issue)(lock)(unlock)(redeem)(transfer)(burn))
+EOSIO_DISPATCH(ampersand::slvrtoken, 
+               (create)(issue)(lock)(unlock)(redeemlock)(redeemunlock)(redeem)(transfer)(burn))

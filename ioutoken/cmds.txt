@@ -1,6 +1,14 @@
 #
 # cleos commands to work with ioutoken
 #
+// build
+eosio-cpp ioutoken.cpp -o ioutoken.wasm --abigen
+
+OR => 
+
+cmake .
+make
+
 cleos push action ioutokenac create '["ioutokenac", "10000.0000 IOU", true]' -p ioutokenac
 
 cleos push action ioutokenac issue '["cust2", "100.0000 IOU", "memo"]' -p ioutokenac
